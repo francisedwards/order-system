@@ -1,4 +1,4 @@
-# maven-project
+# order-processing
 
 This is my ProcessOrders project from MuleSoft's advanced development class
 
