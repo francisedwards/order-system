@@ -16,15 +16,18 @@ http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/cu
 		wsdlLocation="orders.wsdl" service="OrderServiceService" port="OrderServicePort"
 		serviceAddress="http://training-u.cloudhub.io/advanced/orders"
 		doc:name="Web Service Consumer" />
-    <flow name="main">
-        <http:listener config-ref="http8081" path="/orders" doc:name="HTTP"/>
-        <flow-ref name="retrieveOrders" doc:name="retrieveOrders"/>
-        <flow-ref name="processOrders" doc:name="processOrders"/>
-    </flow>
-    <flow name="retrieveOrders">
-        <set-variable variableName="dateRange" value="#[message.inboundProperties.'http.query.params'.range]" doc:name="Variable"/>
-        <dw:transform-message doc:name="Transform Message">
-            <dw:set-payload><![CDATA[%dw 1.0
+	<flow name="main">
+		<http:listener config-ref="http8081" path="/orders"
+			doc:name="HTTP" />
+		<flow-ref name="retrieveOrders" doc:name="retrieveOrders" />
+		<flow-ref name="processOrders" doc:name="processOrders" />
+	</flow>
+	<flow name="retrieveOrders">
+		<set-variable variableName="dateRange"
+			value="#[message.inboundProperties.'http.query.params'.range]"
+			doc:name="Variable" />
+		<dw:transform-message doc:name="Transform Message">
+			<dw:set-payload><![CDATA[%dw 1.0
 %output application/xml
 %namespace ns0 http://soap.training.mulesoft.com/
 ---
@@ -33,17 +36,18 @@ http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/cu
 		dateRange: flowVars.dateRange as :string
 	}
 }]]></dw:set-payload>
-        </dw:transform-message>
-        <ws:consumer config-ref="Web_Service_Consumer" operation="provisionOrder" doc:name="Web Service Consumer"/>
-        <dw:transform-message doc:name="Transform Message">
-            <dw:input-payload doc:sample="sample_data\provisionOrderResponse.xml"/>
-            <dw:set-payload><![CDATA[%dw 1.0
+		</dw:transform-message>
+		<ws:consumer config-ref="Web_Service_Consumer" operation="provisionOrder"
+			doc:name="Web Service Consumer" />
+		<dw:transform-message doc:name="Transform Message">
+			<dw:input-payload doc:sample="sample_data\provisionOrderResponse.xml" />
+			<dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 %namespace ns0 http://soap.training.mulesoft.com/
 ---
 payload.ns0#provisionOrderResponse.*return]]></dw:set-payload>
-        </dw:transform-message>
-    </flow>
+		</dw:transform-message>
+	</flow>
 	<flow name="processOrders">
 		<set-variable variableName="orders" value="#[message.payload]"
 			doc:name="Variable" />
@@ -54,5 +58,4 @@ payload.ns0#provisionOrderResponse.*return]]></dw:set-payload>
 			<dw:set-payload resource="classpath:processOrders01.dwl" />
 		</dw:transform-message>
 	</flow>
-
 </mule>
